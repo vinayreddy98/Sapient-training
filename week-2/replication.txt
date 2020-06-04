@@ -1,0 +1,50 @@
+Implementation Steps:-
+
+Step 1:         mongod --port 27017 --dbpath /var/lib/mongodb --replSet replicationSet
+
+Step2:          Initiating replica set
+	     rs.initiate()
+
+Step 3.          Starting other 2 servers at 27018 and 27019(open another instance of terminal)
+
+	         mongod --port 27018 --dbpath /var/lib/mongodb1 --replSet replicationSet
+                              mongod --port 27019 --dbpath /var/lib/mongodb2 --replSet replicationSet
+
+Step 4 :         mongo --port 27017 (to run queries in primary node)
+
+Step 5 :         rs.initiate() (for initiating replication set)
+
+Step 6 :         rs.add("localhost:27018");
+   
+Step 7 :         rs.add("localhost:27019");
+
+Step 8:         make a config document given below-
+
+     config = {
+                       "_id" : "replication",
+                       "members" : [
+                                   {
+                                          "_id" : 0,
+                                          "host" : "mongo-node-1:27017"
+                                     },
+                                    {
+                                          "_id" : 1,
+                                          "host" : "mongo-node-2:27017"
+                                      },
+                                     {
+                                           "_id" : 2,
+                                           "host" : "mongo-node-3:27017",
+                                           "priority" : 0,
+                                           "slaveDelay": 3600,
+                                           "hidden": true
+                                 }
+                          ]
+                 }
+                     
+Step 9:          rs.reconfig(cnf)
+
+Step 10 :       rs.config() (to verify the delay of the node)
+
+Step 11:        now you can log into other containers and set the salve status by the following commands-
+                         
+                           rs.slaveOk(true)
